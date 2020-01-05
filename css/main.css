@@ -1,0 +1,139 @@
+@font-face { font-family: 'Roboto'; src: url('../fonts/roboto/Roboto-Regular.ttf') format('truetype'); } 
+
+*{
+    font-family: Roboto;
+    box-sizing: border-box;
+}
+
+body{
+    margin: 0;
+}
+h3 {
+    color: #fff;
+    font-size: 27px;
+    padding-left: 28px;
+}
+
+header{
+    background: #333;
+}
+
+
+div.center{
+    display: flex;
+    height: 100vh;
+}
+
+div.center aside{
+    width: 300px;
+    background: #272727;
+}
+
+button.refresh{
+    position: absolute;
+    right: 25px;
+    top: 20px;
+    font-size: 18px;
+    color: #fff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transform: rotate(0deg);
+    transition: 150ms;
+}
+
+button.refresh:hover{
+    transform: rotate(90deg);
+}
+
+
+aside{
+    box-sizing: border-box;
+    cursor: default;
+    padding-top: 10px;
+    position: relative;
+}
+aside ul{
+    list-style: none;
+    padding: 0;
+}
+
+aside ul li{
+    display: flex;
+    font-size: 16px;
+    color: #b3b3b3;
+    padding: 5px 0;
+    transition: 150ms;
+}
+aside ul li.aktiv{
+    background: #000;
+}
+aside ul li:hover{
+    background: #222;
+}
+aside h3{
+    color: #eaeaea;
+    padding: 0px 17px;
+    margin: 0;
+}
+
+aside ul li .icon{
+    margin-top: -2px;
+    opacity: 0;
+    cursor: pointer;
+}
+aside ul li:hover .icon {
+    opacity: 1;
+}
+aside ul li .icon i{
+    padding: 0px 6px;
+    font-size: 11px;
+}
+
+aside > .icon {
+    position: absolute;
+    right: 11px;
+    color: #9B9B9B;
+    font-size: 17px;
+    cursor: pointer;
+    top: 17px;
+}
+
+.menuItem{
+    position: absolute;
+    background: #1F1F1F;
+    box-shadow: 0px 2px 4px -1px #000;
+    color: #b0b0b0;
+    font-size: 13px;
+    width: 160px;
+    cursor: default;
+}
+
+.menuItem ul{
+    padding: 0;
+    list-style: none;
+}
+
+.menuItem ul{
+    padding: 0;
+    list-style: none;
+    margin: 6px 0;
+}
+
+.menuItem ul li{
+    padding: 4px 10px;
+}
+
+.menuItem ul li:hover{
+    background: #252525;
+}
+
+
+@media (max-width: 800px){
+
+    div.center aside{
+        width: 0;
+        overflow: hidden;
+    }
+
+}
