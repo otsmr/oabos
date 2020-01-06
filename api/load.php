@@ -1,107 +1,81 @@
 <?php
+$logged = false;
+$apikey = false;
 
-/**
- * Session wird initialisiert
- */
+if (isset($_GET["apikey"])) {
+	
+    $apikey = $_GET["apikey"];
+	
+}
 
 session_name('sid');
 session_start();
 
+require_once __DIR__ . "/../config.php";
 
-/**
- * Startup
- */
-
-require_once(__DIR__ . "/../config.php");
-
-function odmin () {
-    global $CONFIG;
-
-    if (!isset($_COOKIE['token'])) return null;
-
-    $url = $CONFIG["odmin_base_url"] . "/api/istokenvalid/" . $_COOKIE['token'];
-
+if(isset($_COOKIE['token'])){
+    
     try {
 
-        $res = json_decode(file_get_contents($url));
+        $res = json_decode(file_get_contents($apiURL));
     
         if(isset($res->valid) && $res->valid) {
-            return $res->user->id;
+            $userID = $res->user->id;
+            $logged = true;
         }
 
     } catch (\Throwable $th) { }
 
-    return null;
-
 }
 
-class Output{
-    
-    public function error($code = false, $return = false){
-        $r = json_encode([
-            "error" => $code
-        ]);
-        if($return) return $r;
-        
-        echo $r;
-        die();
-    }
-
-    public function success($code = true, $return = false){
-        $r = json_encode([
-            "ok" => $code
-        ]);
-        if($return) return $r;
-        
-        echo $r;
-        die();
-    }
-
+if (!$logged && !$apikey) {
+    header("Location: $loginURL");
+    die();
 }
 
+if (!$apikey) {
+    $uniqueID = md5($CONFIG["dbsecret"] . $userID . $CONFIG["dbsecret"]);
+} else {
+    $uniqueID = $apikey;
+}
 
-class DB{
+$root = __DIR__ . "/../feeds/" . $uniqueID;
+if(!is_dir($root)) mkdir($root, 0700);
 
-    private $conn;
-    private $o;
+$path = $root . "/feed.json";
 
-    public function __construct(){
 
-        $this->o = new Output();
-        $this->connect();
+function updateFeedFile ($data) {
+    global $path;
+    $handle = fopen($path, "w");
+	$write = @fwrite ($handle, json_encode($data));
+	fclose ($handle);
+}
 
-    }
+function getFeedFromFile () {
+    global $path;
+    if (!is_file($path)) return [];
+    return json_decode(file_get_contents($path));
+}
 
-    private function connect(){
+function getRandID($l = 9, $c = "1234567890", $u = FALSE) {
+    for ($s = '', $i = 0, $z = strlen($c)-1; $i < $l; $x = rand(0,$z), $s .= $c{$x}, $i++);
+    return $s;
+}
 
-        global $CONFIG;
-        $this->conn = @mysqli_connect($CONFIG["dbhost"], $CONFIG["dbuser"], $CONFIG["dbpassword"], $CONFIG["dbname"]);
+function startsWith($haystack, $needle){
+    $length = strlen($needle);
+    return (substr($haystack, 0, $length) === $needle);
+}
 
-        if(!$this->conn){ 
-            $this->o->error("Es konnte keine Verbindung zur Datenbank hergestellt werden.");
-        }
+function error ($code) {
+    die(json_encode([
+        "error" => $code
+    ]));
+}
 
-    }
-
-    public function get($sql){
-        try{
-            $res = $this->query($sql);
-            if($res) return @mysqli_fetch_array($res);
-            else return false;
-        }catch(Exception $e){
-            return false;
-        }
-    }
-
-    public function set($sql){
-        return @mysqli_query($this->conn, $sql);
-    }
-    public function query($sql){
-        return mysqli_query($this->conn, $sql);
-    }
-
-    public function check($check){
-        return mysqli_real_escape_string($this->conn, $check);
-    }
-
+function success($code = true){
+    die(json_encode([
+        "ok" => $code
+    ]));
 }

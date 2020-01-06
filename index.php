@@ -1,46 +1,24 @@
 <?php
 
-$apikey = false;
-if (isset($_GET["apikey"])) {
-	
-	$apikey = $_GET["apikey"];
-    require_once __DIR__ . "/api/getFeed.php";
-    
-	print_r(json_encode([
-		"chanel" => $onlyRss,
-		"feed"=> $items
-    ]));
-    
-	die();
-	
-}
-
 require_once __DIR__ . "/api/load.php";
-
-$logged = false;
-
-$link = $CONFIG["odmin_base_url"] . "/login?service=" . $CONFIG["odmin_service_name"];
-
-
-if(isset($_COOKIE['token'])){
-    
-    $userID = odmin();
-    
-    if (!is_null($userID)) {
-        $logged = true;
-    }
-    else header("Location: $link");
-
-} else {
-    header("Location: $link");
-    die();
-}
 
 require_once __DIR__ . "/api/getFeed.php";
 
+if ($apikey) {
+
+    print_r(json_encode([
+        "chanel" => $onlyRss,
+        "feed"=> $items
+    ]));
+    
+    die();
+
+}
+
+
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,6 +30,8 @@ require_once __DIR__ . "/api/getFeed.php";
     <link rel="stylesheet" href="css/list.css">
     <link rel="stylesheet" href="css/dialog.css">
     <link rel="stylesheet" href="css/main.css">
+
+    <meta apikey="<?php echo $uniqueID ?>">
 
     <script src="js/jquery.min.js"></script>
 </head>

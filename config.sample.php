@@ -1,10 +1,10 @@
 <?php
 
 $CONFIG = array (
-  'dbname' => "",
-  'dbhost' => "",
-  'dbuser' => "",
-  'dbpassword' => "",
-  'odmin_service_name' => "",
+  'dbsecret' => '',
+  'odmin_service_name' => '',
   'odmin_base_url' => ""
 );
+
+$loginURL = $CONFIG["odmin_base_url"] . "/login?service=" . $CONFIG["odmin_service_name"];
+$apiURL = $CONFIG["odmin_base_url"] . "/api/istokenvalid/" . $_COOKIE['token'];

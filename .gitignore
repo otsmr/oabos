@@ -1,1 +1,6 @@
+feeds/**/*
+!feeds/.htaccess
+
+api/cache/tmp/
+
 config.php
