@@ -1,4 +1,5 @@
 <?php 
+error_reporting(0);
 
 $ytid = htmlentities($_GET["id"]);
 $ytid = preg_replace("/[^a-zA-Z0-9-_]+/", "", $ytid);
