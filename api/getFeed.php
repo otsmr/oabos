@@ -1,19 +1,10 @@
-
 <?php
 
-if(!$apikey && !isset($_COOKIE["token"])) die(json_encode([
-    "error" => "Kein User angemeldet"
-]));
+if (!$loaded_from_index) die();
 
-/*
-#######################################
-    Load Files
-#######################################
-*/
-require_once __DIR__ . "/load.php";
-require_once __DIR__ . "/reader/read.php";
-require_once __DIR__ . "/cache/cache.php";
-
+require_once "load.php";
+require_once "reader/read.php";
+require_once "cache/cache.php";
 
 $dbFeed = getFeedFromFile();
 

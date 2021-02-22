@@ -2,16 +2,13 @@
 
 namespace API;
 
-if(!isset($_COOKIE["token"])) die(json_encode([
-    "error" => "Kein User angemeldet"
-]));
+if (!$loaded_from_index) die();
 
 if(!isset($_POST["type"])) die(json_encode([
     "error" => "Fehlerhafte Anfrage"
 ]));
 
 require_once __DIR__ . "/load.php";
-
 
 if ($_POST["type"] === "removeItem") {
 

@@ -18,6 +18,12 @@ header{
     background: #333;
 }
 
+.logoutbtn {
+    color: #717070;
+    text-decoration: none; 
+    margin: 9px 30px -18px; 
+    display: block;
+}
 
 div.center{
     display: flex;

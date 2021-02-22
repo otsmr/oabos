@@ -1,10 +1,13 @@
 <?php
 
-require_once __DIR__ . "/api/load.php";
+$loaded_from_index = true;
 
-require_once __DIR__ . "/api/getFeed.php";
+require_once "api/load.php";
+require_once "api/getFeed.php";
 
 if ($apikey) {
+
+    header('Content-type: application/json; charset=utf-8');
 
     print_r(json_encode([
         "chanel" => $onlyRss,
@@ -14,7 +17,6 @@ if ($apikey) {
     die();
 
 }
-
 
 ?>
 <!DOCTYPE html>
@@ -31,7 +33,7 @@ if ($apikey) {
     <link rel="stylesheet" href="css/dialog.css">
     <link rel="stylesheet" href="css/main.css">
 
-    <meta apikey="<?php echo $uniqueID ?>">
+    <meta apikey="<?php echo $folder_name ?>">
 
     <script src="js/jquery.min.js"></script>
 </head>
@@ -83,18 +85,14 @@ if ($apikey) {
         </aside>
 
         <div class="items">
-            <a style="color: #717070; text-decoration: none; margin: 9px 30px -18px; display: block;" href='<?php echo $CONFIG["odmin_base_url"] ?>/api/logout/<?php echo $_COOKIE["token"] ?>?service=<?php echo $CONFIG["odmin_service_name"] ?>'>Abmelden</a>
-
-
+            <a class="logoutbtn" href='<?php echo $odmin->get_signout_url(); ?>'>Abmelden</a>
         <?php
-
 
         $names = [];
 
         foreach($dbFeed as $struct) {
             $names[$struct->id] = $struct->name;
         }
-
 
         function generateItems($items, $title){
             global $names;

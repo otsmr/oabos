@@ -1,81 +1,49 @@
 <?php
+
+require_once "api/odmin/init.php";
+require_once "utils.php";
+
 $logged = false;
 $apikey = false;
 
 if (isset($_GET["apikey"])) {
-	
-    $apikey = $_GET["apikey"];
-	
+    $apikey = preg_replace('/([^A-Za-z0-9_])/g', "", (string) $_GET["apikey"]);
 }
 
-session_name('sid');
-session_start();
+$odmin->init_session_from_cookie();
 
-require_once __DIR__ . "/../config.php";
+$root = __DIR__ . "/../feeds/";
 
-if(isset($_COOKIE['token'])){
-    
-    try {
+if ($apikey && is_dir($root . $apikey)) {
 
-        $res = json_decode(file_get_contents($apiURL));
-    
-        if(isset($res->valid) && $res->valid) {
-            $userID = $res->user->id;
-            $logged = true;
+    $root = $root . $apikey;    
+
+} else if ($odmin->is_logged_in()) {
+
+    $folder_name = "";
+
+    $d = dir($root);
+
+    while (false !== ($entry = $d->read()))
+    {
+        if (is_dir($root . $entry) && (str_starts_with($entry, $odmin->session->user_id . "_"))) {
+            $folder_name = $entry;
+            break;
         }
+    }
 
-    } catch (\Throwable $th) { }
+    if ($folder_name === "") {
+        $folder_name = $odmin->session->user_id . "_" . getRandString();
+    }
 
-}
+    $root = $root . $folder_name;
 
-if (!$logged && !$apikey) {
-    header("Location: $loginURL");
+    if(!is_dir($root))
+        mkdir($root, 0700);
+
+} else {
+    header("Location: " . $odmin->get_signin_url());
     die();
 }
 
-if (!$apikey) {
-    $uniqueID = md5($CONFIG["dbsecret"] . $userID . $CONFIG["dbsecret"]);
-} else {
-    $uniqueID = $apikey;
-}
-
-$root = __DIR__ . "/../feeds/" . $uniqueID;
-if(!is_dir($root)) mkdir($root, 0700);
-
 $path = $root . "/feed.json";
-
-
-function updateFeedFile ($data) {
-    global $path;
-    $handle = fopen($path, "w");
-	$write = @fwrite ($handle, json_encode($data));
-	fclose ($handle);
-}
-
-function getFeedFromFile () {
-    global $path;
-    if (!is_file($path)) return [];
-    return json_decode(file_get_contents($path));
-}
-
-function getRandID($l = 9, $c = "1234567890", $u = FALSE) {
-    for ($s = '', $i = 0, $z = strlen($c)-1; $i < $l; $x = rand(0,$z), $s .= $c{$x}, $i++);
-    return $s;
-}
-
-function startsWith($haystack, $needle){
-    $length = strlen($needle);
-    return (substr($haystack, 0, $length) === $needle);
-}
-
-function error ($code) {
-    die(json_encode([
-        "error" => $code
-    ]));
-}
-
-function success($code = true){
-    die(json_encode([
-        "ok" => $code
-    ]));
-}
