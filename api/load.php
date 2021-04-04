@@ -26,7 +26,7 @@ if ($apikey && is_dir($root . $apikey)) {
 
     while (false !== ($entry = $d->read()))
     {
-        if (is_dir($root . $entry) && (str_starts_with($entry, $odmin->session->user_id . "_"))) {
+        if (is_dir($root . $entry) && (startsWith($entry, $odmin->session->user_id . "_"))) {
             $folder_name = $entry;
             break;
         }
