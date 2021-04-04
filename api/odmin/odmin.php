@@ -156,7 +156,7 @@ namespace ODMIN {
 
     class fetch {
     
-        function post ($url, $data=NULL) {
+        static function post ($url, $data=NULL) {
 
             // print_r("POST: $url<br>");
     
