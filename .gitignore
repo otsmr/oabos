@@ -1,6 +1,7 @@
-feeds/**/*
-!feeds/.htaccess
+/app/api/cache/*.cache
 
-/api/cache/tmp/
+/app/api/db/**/*
+!/app/api/db/.htaccess
 
-/**/config.php
+config.php
+.DS_Store
