@@ -52,7 +52,7 @@ if($refresh || !($feed = $cache->load($cacheID))) {
     }
 
     uasort($feed, function($a, $b) {
-        return ($a['date'] > $b['date']) ? 1 : -1;
+        return ($a['date'] > $b['date']) ? -1 : 1;
     });
 
     $feed = @json_decode(json_encode($feed));
