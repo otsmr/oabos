@@ -26,7 +26,6 @@ require_once "api/feed.php";
 </head>
 <body>
     
-
     <header>
         <form method="post">
             <button type="submit" value='true' name='refresh' class="refresh">

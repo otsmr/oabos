@@ -5,7 +5,7 @@ class Cache{
 
     public function load($requestID){
 
-        $path = __DIR__ . "/cache/$requestID.cache";
+        $path = __DIR__ . "/../data/cache/$requestID.cache";
 
         // Der Cache ist 30 Minuten gültig
         if(is_file($path) && filemtime($path) < time() - 60 * 30){

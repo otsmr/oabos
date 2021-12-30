@@ -4,20 +4,18 @@ class DB {
 
     public function __construct (string $user_id) {
 
-        $root = __DIR__ . "/db/$user_id";
+        $this->root = __DIR__ . "/../data/user/$user_id";
 
-        if(!is_dir($root))
-            mkdir($root, 0700);
-
-        $this->root = $root;
+        if(!is_dir($this->root))
+            mkdir($this->root, 0700);
 
     }
 
     public function update_content ($data) {
 
         $handle = fopen($this->root . "/feed.json", "w");
-        $write = @fwrite ($handle, json_encode($data));
-        fclose ($handle);
+        $write = @fwrite($handle, json_encode($data));
+        fclose($handle);
 
     }
 

@@ -1,7 +1,9 @@
-/app/api/cache/*.cache
 
-/app/api/db/**/*
-!/app/api/db/.htaccess
+/app/data/user/**/*
+/app/data/cache/**/*
 
 config.php
+
 .DS_Store
+!.gitkeep
+!.htaccess
