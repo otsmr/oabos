@@ -48,20 +48,27 @@ triggerAll("[yt-id]", "click", (event) =>{
     const element = event.currentTarget;
     const videoID = element.attributes["yt-id"].value;
 
-    $(".playerAktiv")?.classList.remove("playerAktiv")
+    function remove () {
 
-    const player = $("#ytplayer");
-
-    if (player !== null) {
-
-        const closedID = $("#ytplayer").attributes["yt-id"].value;
-        
-        player.remove();
-
-        if(closedID === videoID)
-            return;
+        $(".playerAktiv")?.classList.remove("playerAktiv");
+        $(".overlay")?.remove();
+        $("#ytplayer")?.remove();
 
     }
+
+    const closeID = $("#ytplayer")?.attributes["yt-id"].value
+    remove();
+    
+    if(closeID === videoID)
+        return;
+
+
+    const overlay = document.createElement("div");
+    overlay.classList.add("overlay");
+    overlay.addEventListener("click", remove);
+
+    document.body.appendChild(overlay);
+
 
     const iframe = document.createElement("iframe");
     iframe.id = "ytplayer";
@@ -91,6 +98,33 @@ function displayImages () {
     })
 
 }
+
+function humanTimeDiff(d) {
+
+    diff = new Date().getTime() - d.getTime();
+    diff = parseInt(diff / 1000 / 60 / 60 / 24);
+    display = "";
+
+    switch(diff) {
+        case 0: display = "Heute";break;
+        case 1: display = "Gestern"; break;
+        default:
+            display = "vor ";
+            if (diff > 365) {
+                display += parseInt(diff / 365) + " Jahr(en)";
+            } else {
+                display += diff + " Tagen";
+            }
+    }
+    return display;
+
+}
+
+[...document.querySelectorAll("span.time")].forEach(element => {
+    
+    element.innerText = humanTimeDiff(new Date(element.innerText.slice(0, 10)));
+
+})
 
 window.onload = displayImages;
 trigger(".items", "scroll", displayImages)
