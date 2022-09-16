@@ -4,17 +4,16 @@ require_once __DIR__ . "/api/odmin/init.php";
 
 $odmin->init_session_from_cookie();
 
-if (!$odmin->is_logged_in()) {
-    header("Location: " . $odmin->get_signin_url());
-    die();
+if ($odmin->is_logged_in()) {
+    require_once "api/feed.php";
 }
 
-require_once "api/feed.php";
-
 ?>
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -25,6 +24,29 @@ require_once "api/feed.php";
 
 </head>
 <body>
+
+<?php if (!$odmin->is_logged_in()): ?>
+
+    <main class="start-container">
+        <header>
+            <h1>YT Abos</h1>
+            <p class='desc'>Ein Service von <a href='https://tsmr.eu'>tsmr.eu.</a></p>
+        </header>
+        <a href="<?php echo $odmin->get_signin_url(); ?>" ><button class="button center">Anmelden</button><a>
+        <ul>
+            <a target='_blank' href='https://github.com/otsmr/osurl'>
+                <li>Projekt auf Github</li>
+            </a>
+            <a target='_blank' href='https://oproj.de/privacy'>
+                <li>Datenschutz</li>
+            </a>
+            <a target='_blank' href='https://oproj.de/imprint'>
+                <li>Impressum</li>
+            </a>
+        </ul>
+    </main>
+
+<?php else: ?>
     
     <header>
         <form method="post">
@@ -40,7 +62,7 @@ require_once "api/feed.php";
 
             
             <div class="header">
-                <h3>YouTube Abos</h3>
+                <h3>YT Abos</h3>
                 <div class="add-icon" onclick="addToFeed()">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                 </div>
@@ -88,6 +110,8 @@ require_once "api/feed.php";
     </div>
     
     <script src="main.js"></script>
+
+<?php endif; ?>
 
 </body>
 </html>

@@ -5,16 +5,82 @@
 }
 
 body{
+    background: #111111;
+    height: 100vh;
+    width: 100vw;
     margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
 }
+
+
+.start-container{
+    border: 1px solid #666;
+    max-width: 350px;
+    width: 80%;
+    color: #bbb;
+    min-height: 300px;
+    padding: 34px;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 6px;
+}
+.start-container h1 {
+    font-size: 22px;
+}
+
+.start-container .button{
+    border: 0;
+    padding: 7px 14px;
+    border-radius: 3px;
+    font-size: 15px;
+    background: #1564bf;
+    color: #000;
+    cursor: pointer;
+    transition: background 150ms;
+    outline: 0;
+    text-decoration: none;
+    margin: 14px 0 0 auto;
+    display: block;
+}
+.start-container .button.center {
+    margin: 14px auto 0;
+}
+.start-container .button:hover{
+    background: #0554af;
+}
+
+.start-container a {
+    cursor: pointer;
+    text-decoration: none;
+    color: #fff;
+}
+
+.start-container ul {
+    list-style: none;
+    padding: 0;
+    display: block;
+    text-align: right;
+    font-size: 12px;
+    position: absolute;
+    bottom: -34px;
+    right: 0;
+}
+
+.start-container ul li {
+    color: #444;
+    display: inline-block;
+    margin: 0 7px;
+}
+
+
 h3 {
     color: #fff;
     font-size: 27px;
     padding-left: 28px;
-}
-
-header{
-    background: #333;
 }
 
 .logoutbtn {
@@ -130,7 +196,7 @@ aside .trash-icon:hover svg {
     padding: 0;
     display: grid;
     grid-gap: 30px;
-    grid-template-columns: repeat(auto-fit, 280px);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     grid-auto-flow: row dense;
     padding: 0 28px;
 }
