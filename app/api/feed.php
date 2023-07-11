@@ -36,6 +36,10 @@ if($refresh || !($feed = $cache->load($cacheID))) {
 
         $videos = ((array) $data)["entry"];
 
+        if (gettype($videos) == "object") {
+			$videos = [$videos];
+		}
+
         foreach ($videos as &$video) {
 
             array_push($feed, [
