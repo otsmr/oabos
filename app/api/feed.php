@@ -20,8 +20,17 @@ if($refresh || !($feed = $cache->load($cacheID))) {
     $feed = [];
 
     foreach ($yt_abos as &$yt_abo) {
+		
+		ini_set('default_socket_timeout', 1);
+		
+		$options  = array(
+			'http' => array(
+				'user_agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:101.0) Gecko/20100101 Firefox/101.0'
+			)
+		);
+		
+        $data = @file_get_contents($yt_abo->url, false, $context);
 
-        $data = @file_get_contents($yt_abo->url);
 
         if (!$data)
             continue;
@@ -35,8 +44,8 @@ if($refresh || !($feed = $cache->load($cacheID))) {
         $data = simplexml_load_string($data);
 
         $videos = ((array) $data)["entry"];
-
-        if (gettype($videos) == "object") {
+		
+		if (gettype($videos) == "object") {
 			$videos = [$videos];
 		}
 
