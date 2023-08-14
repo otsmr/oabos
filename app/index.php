@@ -5,7 +5,8 @@ require_once __DIR__ . "/api/odmin/init.php";
 $odmin->init_session_from_cookie();
 
 if ($odmin->is_logged_in()) {
-    require_once "api/feed.php";
+  $logged_in_odmin_id = $odmin->session->user_id;
+  require_once "api/feed.php";
 }
 
 ?>
@@ -13,15 +14,13 @@ if ($odmin->is_logged_in()) {
 <!DOCTYPE html>
 <html lang="de">
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>YT Abos</title>
-    
+
     <link rel="shortcut icon" type="image/png" href="/img/favicon.png"/>
     <link rel="stylesheet" href="style.css">
-
 </head>
 <body>
 
@@ -47,7 +46,11 @@ if ($odmin->is_logged_in()) {
     </main>
 
 <?php else: ?>
-    
+
+<!-- Your API-Key: <?php echo $db->get_api_key(); ?> -->
+<!-- Your User-ID: <?php echo $odmin->session->user_id; ?> -->
+<!-- API-LINK: https://oabos.de/api.php?api_key=<?php echo $db->get_api_key(); ?>&user_id=<?php echo $odmin->session->user_id; ?> -->
+
     <header>
         <form method="post">
             <button type="submit" value='true' name='refresh' class="refresh">
@@ -59,15 +62,13 @@ if ($odmin->is_logged_in()) {
     <div class="center">
 
         <aside>
-
-            
             <div class="header">
                 <h3>YT Abos</h3>
                 <div class="add-icon" onclick="addToFeed()">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#FFFFFF"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                 </div>
             </div>
-            
+
             <ul>
                 <?php foreach ($yt_abos as $item): $item; ?>
                     <li onclick="removeFromFeed('<?php echo $item->id; ?>')">
@@ -86,21 +87,19 @@ if ($odmin->is_logged_in()) {
         <div class="items">
 
             <a class="logoutbtn" href='<?php echo $odmin->get_signout_url(); ?>'>Abmelden</a>
-            
+
             <br /><br /><br />
 
             <ul class='liste'>
                 <?php foreach ($feed as &$item):
-                    $wID = substr(strrchr($item->link, "="), 1);
                     ?>
-                    <li class="item" from="<?php echo $item->id ?>" yt-id="<?php echo $wID ?>" class='openVideo'>
-
-                        <img link="img/youtube.php?id=<?php echo $wID ?>" src="img/placeholder.png">
+                    <li class="item" from="<?php echo $item->id ?>" yt-id="<?php echo $item->id ?>" class='openVideo'>
+                        <img link="<?php echo $item->img ?>" src="img/placeholder.png">
                         <p class='title'>
                             <?php echo $item->title ?>
                         </p>
                         <p class='kanal'>
-                            <?php echo $item->channel_name; ?> - <span class="time"><?php echo $item->date; ?> </span>
+                            <?php echo $item->channel; ?> - <span class="time"><?php echo $item->date; ?> </span>
                         </p>
                     </li>
                 <?php endforeach; ?>
@@ -108,7 +107,7 @@ if ($odmin->is_logged_in()) {
 
         </div>
     </div>
-    
+
     <script src="main.js"></script>
 
 <?php endif; ?>
