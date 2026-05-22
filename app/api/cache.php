@@ -27,7 +27,7 @@ class Cache{
 
     public function update($requestID, $data){
 
-        $path = __DIR__ . "/cache/$requestID.cache";
+        $path = __DIR__ . "/../data/cache/$requestID.cache";
 
         $data = json_encode($data);
 

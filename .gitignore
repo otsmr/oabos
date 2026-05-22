@@ -1,6 +1,8 @@
 
 /app/data/user/**/*
 /app/data/cache/**/*
+/app/data/*.json
+!/app/data/config.json
 
 config.php
 

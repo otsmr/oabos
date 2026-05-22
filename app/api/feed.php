@@ -16,15 +16,15 @@ if ($refresh || !($feed = $cache->load($cacheID))) {
 
   $feed = [];
 
+  $options  = array(
+      'http' => array(
+          'user_agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:101.0) Gecko/20100101 Firefox/101.0',
+          'timeout' => 2
+      )
+  );
+  $context = stream_context_create($options);
+
   foreach ($yt_abos as &$yt_abo) {
-
-		ini_set('default_socket_timeout', 1);
-
-		$options  = array(
-			'http' => array(
-				'user_agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:101.0) Gecko/20100101 Firefox/101.0'
-			)
-		);
 
     $data = @file_get_contents($yt_abo->url, false, $context);
 
@@ -48,14 +48,16 @@ if ($refresh || !($feed = $cache->load($cacheID))) {
 
     foreach ($videos as &$video) {
       $video_id = substr(strrchr((string) $video->link["href"], "="), 1);
-      array_push($feed, [
-        "id" => $video_id,
-        "channel" => trim((string) $yt_abo->name),
-        "title" => (string) $video->title,
-        "link" => (string) $video->link["href"],
-        "img" => "https://oabos.de/img/youtube.php?id=$video_id",
-        "date" => (string) $video->published,
-      ]);
+	  if ($video_id != "") {
+		  array_push($feed, [
+			"id" => $video_id,
+			"channel" => trim((string) $yt_abo->name),
+			"title" => (string) $video->title,
+			"link" => (string) $video->link["href"],
+			"img" => "https://oabos.de/img/youtube.php?id=$video_id",
+			"date" => (string) $video->published,
+		  ]);
+	  }
     }
 
   }

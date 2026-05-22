@@ -33,4 +33,50 @@ class DB {
       return @json_decode(file_get_contents($this->root . "/feed.json"));
     }
 
+    public function get_watch_progress() {
+        $file = $this->root . "/watch_progress.json";
+        if (!is_file($file)) {
+            return new stdClass();
+        }
+        $data = @json_decode(file_get_contents($file), true);
+        if (!is_array($data)) {
+            return new stdClass();
+        }
+        
+        $changed = false;
+        $now = time();
+        $three_days = 259200; // 3 * 24 * 60 * 60
+        
+        foreach ($data as $id => $item) {
+            if (!isset($item['timestamp']) || ($now - $item['timestamp']) > $three_days) {
+                unset($data[$id]);
+                $changed = true;
+            }
+        }
+        
+        if ($changed) {
+            $handle = fopen($file, "w");
+            @fwrite($handle, json_encode((object) $data));
+            fclose($handle);
+        }
+        
+        return (object) $data;
+    }
+
+    public function save_watch_progress($video_id, $time, $duration, $percentage) {
+        $progress = (array) $this->get_watch_progress();
+        $progress[$video_id] = [
+            'time' => (float) $time,
+            'duration' => (float) $duration,
+            'percentage' => (float) $percentage,
+            'timestamp' => time()
+        ];
+        
+        $file = $this->root . "/watch_progress.json";
+        $handle = fopen($file, "w");
+        @fwrite($handle, json_encode((object) $progress));
+        fclose($handle);
+    }
+
 }
+
