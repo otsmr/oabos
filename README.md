@@ -1,12 +1,8 @@
-# oabos
+# OneAbo
 
-With oabos, simply subscribe to YouTube channels without a Google account and display them in a clear, tracking- and ad-free list without "recommendations" or "autoplay". 
+YouTube subscription feed without tracking, ads, or algorithms.
 
-## setup
+## Setup
 
-1. start container
-    1. `docker-compose up`
-2. update config.php
-    1. Create new Odmin service
-    2. `callback-url: https://localhost:4003/api/odmin/oauth.php`
-3. goto http://localhost:4003/
+1. Run `docker compose up`
+2. Open `http://localhost:8080`
