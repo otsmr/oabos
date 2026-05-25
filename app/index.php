@@ -6,6 +6,24 @@ $odmin = new \ODMIN\OAuth();
 $auth_error = "";
 $default_mode = "login";
 
+function human_time_diff($date_str) {
+    $d_time = strtotime(substr($date_str, 0, 10));
+    $n_time = strtotime(date("Y-m-d"));
+    $diff = (int)(($n_time - $d_time) / 86400);
+
+    if ($diff <= 0) {
+        return "Heute";
+    } elseif ($diff === 1) {
+        return "Gestern";
+    } else {
+        if ($diff > 365) {
+            return "vor " . (int)($diff / 365) . " Jahr(en)";
+        } else {
+            return "vor " . $diff . " Tagen";
+        }
+    }
+}
+
 // Handle Login / Registration POST requests
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["auth_action"])) {
     $action = $_POST["auth_action"];
@@ -62,7 +80,7 @@ if ($odmin->is_logged_in()) {
     <link rel="shortcut icon" type="image/png" href="img/favicon.png"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.0.1">
 </head>
 <body>
 
@@ -242,7 +260,7 @@ if ($odmin->is_logged_in()) {
                                 <p class='kanal video-meta'>
                                     <span class="channel-name"><?php echo htmlspecialchars($item->channel); ?></span>
                                     <span class="meta-dot">&bull;</span>
-                                    <span class="time"><?php echo htmlspecialchars($item->date); ?> </span>
+                                    <span class="time"><?php echo htmlspecialchars(human_time_diff($item->date)); ?></span>
                                 </p>
                             </div>
                         </li>
@@ -284,10 +302,11 @@ if ($odmin->is_logged_in()) {
 
     <?php if ($odmin->is_logged_in()): ?>
         <script>
+            window.serverUserId = <?php echo json_encode($odmin->session->user_id); ?>;
             window.serverWatchProgress = <?php echo json_encode($db->get_watch_progress()); ?>;
         </script>
     <?php endif; ?>
-    <script src="main.js"></script>
+    <script src="main.js" defer></script>
 
 </body>
 </html>

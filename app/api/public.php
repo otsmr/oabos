@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . "./auth.php";
+require_once __DIR__ . "/auth.php";
 $odmin = new \ODMIN\OAuth();
 require_once __DIR__ . "/db.php";
 

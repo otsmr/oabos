@@ -21,7 +21,8 @@ function saveWatchProgress(videoID, time, duration) {
         progress[videoID] = {
             time: time,
             duration: duration,
-            percentage: percentage
+            percentage: percentage,
+            timestamp: Math.floor(Date.now() / 1000)
         };
         localStorage.setItem('yt_watch_progress', JSON.stringify(progress));
     } catch (e) {
@@ -55,14 +56,14 @@ function renderWatchProgress() {
     } catch (e) {
         return;
     }
-    
+
     document.querySelectorAll("[yt-id]").forEach(card => {
         const videoID = card.getAttribute("yt-id");
         if (!videoID) return;
-        
+
         const data = progress[videoID];
         card.querySelector(".watch-progress-container")?.remove();
-        
+
         if (data && data.percentage > 0) {
             const thumbnailWrapper = card.querySelector(".thumbnail-wrapper");
             if (thumbnailWrapper) {
@@ -86,10 +87,11 @@ function syncProgressToServer(videoID, time, duration, percentage) {
     formData.append('time', time);
     formData.append('duration', duration);
     formData.append('percentage', percentage);
-    
+
     fetch('/api/public.php', {
         method: 'POST',
-        body: formData
+        body: formData,
+        keepalive: true
     }).catch(e => console.error("Error syncing progress to server", e));
 }
 
@@ -124,7 +126,7 @@ function triggerAll(selector, event, fnc) {
 }
 const $ = s => document.querySelector(s);
 
-function removeFromFeed (id) {
+function removeFromFeed(id) {
 
     if (confirm("Sicher?")) {
 
@@ -138,12 +140,12 @@ function removeFromFeed (id) {
         }).then(_ => {
             location.reload();
         })
-        
+
     }
 
 }
 
-function addToFeed () {
+function addToFeed() {
     closeSidebar();
     const modal = document.getElementById("addChannelModal");
     if (modal) {
@@ -162,12 +164,12 @@ function addToFeed () {
     }
 }
 
-triggerAll("[yt-id]", "click", (event) =>{
+triggerAll("[yt-id]", "click", (event) => {
 
     const element = event.currentTarget;
     const videoID = element.attributes["yt-id"].value;
 
-    function remove () {
+    function remove() {
         cleanupActivePlayer();
         $(".playerAktiv")?.classList.remove("playerAktiv");
         $(".overlay")?.remove();
@@ -176,8 +178,8 @@ triggerAll("[yt-id]", "click", (event) =>{
 
     const closeID = $("#ytplayer")?.attributes["yt-id"].value
     remove();
-    
-    if(closeID === videoID)
+
+    if (closeID === videoID)
         return;
 
     const overlay = document.createElement("div");
@@ -211,7 +213,7 @@ triggerAll("[yt-id]", "click", (event) =>{
     iframe.src = src;
 
     element.classList.add("playerAktiv");
-    
+
     const thumbnailWrapper = element.querySelector(".thumbnail-wrapper");
     if (thumbnailWrapper) {
         thumbnailWrapper.after(iframe);
@@ -233,11 +235,11 @@ triggerAll("[yt-id]", "click", (event) =>{
 
         try {
             const data = JSON.parse(event.data);
-            
+
             if (data.event === 'initialDelivery') {
                 iframe.contentWindow.postMessage(JSON.stringify({ event: 'listening' }), '*');
             }
-            
+
             if (data.event === 'infoDelivery' && data.info) {
                 if (data.info.currentTime !== undefined) {
                     activeCurrentTime = data.info.currentTime;
@@ -245,20 +247,20 @@ triggerAll("[yt-id]", "click", (event) =>{
                 if (data.info.duration !== undefined) {
                     activeDuration = data.info.duration;
                 }
-                
+
                 if (activeDuration > 0) {
                     saveWatchProgress(videoID, activeCurrentTime, activeDuration);
                     const pct = (activeCurrentTime / activeDuration) * 100;
                     updateCardProgress(element, pct);
-                    
+
                     const now = Date.now();
-                    if (now - lastSyncTime >= 5000) {
+                    if (now - lastSyncTime >= 2000) {
                         lastSyncTime = now;
                         syncProgressToServer(videoID, activeCurrentTime, activeDuration, pct);
                     }
                 }
             }
-            
+
             if (data.event === 'onStateChange') {
                 const state = data.info;
                 if (state === 2 || state === 0) {
@@ -284,13 +286,13 @@ triggerAll("[yt-id]", "click", (event) =>{
             }
             try {
                 iframe.contentWindow.postMessage(JSON.stringify({ event: 'listening' }), '*');
-            } catch (e) {}
+            } catch (e) { }
             attempts++;
         }, 250);
     });
 });
 
-function displayImages () {
+function displayImages() {
     const scrollContainer = $(".feed-wrapper");
     if (!scrollContainer) return;
 
@@ -331,44 +333,52 @@ function displayImages () {
     });
 }
 
-function humanTimeDiff(d) {
 
-    diff = new Date().getTime() - d.getTime();
-    diff = parseInt(diff / 1000 / 60 / 60 / 24);
-    display = "";
 
-    switch(diff) {
-        case 0: display = "Heute";break;
-        case 1: display = "Gestern"; break;
-        default:
-            display = "vor ";
-            if (diff > 365) {
-                display += parseInt(diff / 365) + " Jahr(en)";
-            } else {
-                display += diff + " Tagen";
+document.addEventListener("DOMContentLoaded", () => {
+    if (window.serverUserId) {
+        try {
+            const localUserId = localStorage.getItem('yt_user_id');
+            if (localUserId !== window.serverUserId) {
+                localStorage.removeItem('yt_watch_progress');
+                localStorage.setItem('yt_user_id', window.serverUserId);
             }
+        } catch (e) {
+            console.error("Error managing user ID in localStorage", e);
+        }
+    } else {
+        localStorage.removeItem('yt_user_id');
+        localStorage.removeItem('yt_watch_progress');
     }
-    return display;
 
-}
-
-[...document.querySelectorAll("span.time")].forEach(element => {
-    
-    element.innerText = humanTimeDiff(new Date(element.innerText.slice(0, 10)));
-
-})
-
-window.onload = () => {
     if (window.serverWatchProgress) {
         try {
-            localStorage.setItem('yt_watch_progress', JSON.stringify(window.serverWatchProgress));
+            const localProgress = JSON.parse(localStorage.getItem('yt_watch_progress') || '{}');
+            const serverProgress = window.serverWatchProgress;
+            const merged = { ...localProgress };
+
+            for (const id in serverProgress) {
+                const serverItem = serverProgress[id];
+                const localItem = localProgress[id];
+
+                if (!localItem) {
+                    merged[id] = serverItem;
+                } else {
+                    const localTime = localItem.timestamp || 0;
+                    const serverTime = serverItem.timestamp || 0;
+                    if (serverTime >= localTime) {
+                        merged[id] = serverItem;
+                    }
+                }
+            }
+            localStorage.setItem('yt_watch_progress', JSON.stringify(merged));
         } catch (e) {
             console.error("Error setting server watch progress in localStorage", e);
         }
     }
-    displayImages();
     renderWatchProgress();
-};
+    displayImages();
+});
 
 // Login / Register Form Toggling
 const authContainer = document.getElementById('authContainer');
@@ -440,24 +450,24 @@ addChannelForm?.addEventListener("submit", (e) => {
         method: "POST",
         body: formData
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data && data.error) {
-            addChannelError.innerText = data.error;
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.error) {
+                addChannelError.innerText = data.error;
+                addChannelError.style.display = "block";
+                addChannelForm.style.display = "block";
+                addChannelLoading.style.display = "none";
+            } else {
+                location.reload();
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            addChannelError.innerText = "Ein Fehler ist aufgetreten.";
             addChannelError.style.display = "block";
             addChannelForm.style.display = "block";
             addChannelLoading.style.display = "none";
-        } else {
-            location.reload();
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        addChannelError.innerText = "Ein Fehler ist aufgetreten.";
-        addChannelError.style.display = "block";
-        addChannelForm.style.display = "block";
-        addChannelLoading.style.display = "none";
-    });
+        });
 });
 
 // Mobile Sidebar Toggle and Overlay interactions
@@ -475,4 +485,13 @@ document.getElementById("mobileSidebarToggle")?.addEventListener("click", openSi
 document.getElementById("sidebarOverlay")?.addEventListener("click", closeSidebar);
 
 // Close sidebar on logout/signout
-document.querySelector(".logoutbtn-link")?.addEventListener("click", closeSidebar);
+document.querySelector(".logoutbtn-link")?.addEventListener("click", () => {
+    localStorage.removeItem('yt_watch_progress');
+    localStorage.removeItem('yt_user_id');
+    closeSidebar();
+});
+
+// Save and sync progress if the user closes/leaves the page
+window.addEventListener("pagehide", () => {
+    cleanupActivePlayer();
+});

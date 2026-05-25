@@ -201,8 +201,12 @@ body {
 }
 
 .brand-headline .accent-text {
+    display: inline-block;
     background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+    -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
+    color: transparent;
 }
 
 .brand-subline {
@@ -895,7 +899,7 @@ body {
     background: #0f172a;
     border: 1px solid var(--border-color-hover);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-    width: 90%;
+    width: min(90vw, calc(85vh * 16 / 9));
     max-width: 960px;
     aspect-ratio: 16 / 9;
     border-radius: var(--radius-lg);
@@ -949,7 +953,8 @@ body {
 }
 
 /* Responsive Rules */
-@media (max-width: 800px) {
+@media (max-width: 800px),
+(max-width: 960px) and (max-height: 500px) and (orientation: landscape) {
     .sidebar {
         position: fixed;
         top: 0;
@@ -1252,4 +1257,20 @@ body {
     background: var(--color-error);
     width: 0%;
     transition: width var(--transition-fast);
+}
+
+/* Mobile Landscape Optimizations */
+@media (max-width: 960px) and (max-height: 500px) and (orientation: landscape) {
+    .mobile-header {
+        height: 48px !important;
+    }
+
+    .feed-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        grid-gap: 16px 12px !important;
+    }
+
+    .feed-wrapper {
+        padding: 16px !important;
+    }
 }
